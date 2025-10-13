@@ -1151,7 +1151,7 @@ class JKQTPLOTTER_LIB_EXPORT JKQTPDatastore{
             auto itmaskend=std::end(mask);
             auto itdata=std::begin(data);
             auto itdataend=std::end(data);
-            const size_t N=std::max<size_t>(std::distance(itmask,itmaskend),std::distance(itdata,itdataend));
+            const size_t N=std::min<size_t>(std::distance(itmask,itmaskend),std::distance(itdata,itdataend));
             double* d=static_cast<double*>(malloc(static_cast<size_t>(N)*sizeof(double)));
             size_t rrs=0;
             for (size_t r=0; r<N; r++) {
