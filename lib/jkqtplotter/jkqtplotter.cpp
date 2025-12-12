@@ -1139,6 +1139,29 @@ void JKQTPlotter::wheelEvent ( QWheelEvent * event ) {
             if (d.x()<=-1 && d.x()>-10) d.setX(-10);
             if (d.y()>=1 && d.y()<10) d.setY(10);
             if (d.y()<=-1 && d.y()>-10) d.setY(-10);
+        } else if (itAction.value()==JKQTPMouseWheelActions::jkqtpmwaZoomFixedMouseByWheel) {
+            acTodo=WheelActionType::ZoomFixedMouse;
+            if (abs(angleDelta.y())>30 && angleDelta.x()==0) {
+                factor=pow(2.0, 1.0*static_cast<double>(angleDelta.y())/120.0);
+            } else if (abs(angleDelta.x())>30 && angleDelta.y()==0) {
+                factor=pow(2.0, 1.0*static_cast<double>(angleDelta.x())/120.0);
+            }
+        } else if (itAction.value()==JKQTPMouseWheelActions::jkqtpmwaZoomFixedMouseByWheelAndTrackpadPan) {
+            // same heuristics as jkqtpmwaZoomByWheelAndTrackpadPan, but uses ZoomFixedMouse instead of Zoom
+            const bool doPan=(abs(angleDelta.x())<30 && abs(angleDelta.y())<30);
+            const bool forcePan=(!doPan && lastWheelActionType==WheelActionType::Pan
+                    && (event->timestamp()-lastWheelActionTimestamp)<maxWheelEventSeriesTimestampDifference);
+            if (forcePan || doPan) {
+                acTodo=WheelActionType::Pan;
+                d=angleDelta;
+            } else {
+                acTodo=WheelActionType::ZoomFixedMouse;
+                if (abs(angleDelta.y())>30 && angleDelta.x()==0) {
+                    factor=pow(2.0, 1.0*static_cast<double>(angleDelta.y())/120.0);
+                } else if (abs(angleDelta.x())>30 && angleDelta.y()==0) {
+                    factor=pow(2.0, 1.0*static_cast<double>(angleDelta.x())/120.0);
+                }
+            }
         }
     }else{
         event->ignore();
@@ -1160,6 +1183,55 @@ void JKQTPlotter::wheelEvent ( QWheelEvent * event ) {
             ymax=getYMax();
         }
         //qDebug()<<"  zoom: factor="<<factor;
+        plotter->setXY(xmin, xmax, ymin, ymax, true);
+    } else if (acTodo==WheelActionType::ZoomFixedMouse && factor!=1.0) {
+        // Zoom while keeping the position under the mouse cursor fixed (Google Maps style)
+        // Get mouse position in data coordinates
+        const double mouse_data_x = plotter->p2x(wheel_x/magnification);
+        const double mouse_data_y = plotter->p2y((wheel_y-getPlotYOffset())/magnification);
+
+        // Get current range
+        const double curr_xmin = getXMin();
+        const double curr_xmax = getXMax();
+        const double curr_ymin = getYMin();
+        const double curr_ymax = getYMax();
+
+        // Calculate new range size
+        const double new_width = (curr_xmax - curr_xmin) / factor;
+        const double new_height = (curr_ymax - curr_ymin) / factor;
+
+        double xmin, xmax, ymin, ymax;
+
+        // Handle zooming outside plot area (only zoom one axis)
+        const bool mouseOnYAxis = (wheel_x/magnification<plotter->getInternalPlotBorderLeft()) || (wheel_x/magnification>plotter->getPlotWidth()+plotter->getInternalPlotBorderLeft());
+        const bool mouseOnXAxis = ((wheel_y-getPlotYOffset())/magnification<plotter->getInternalPlotBorderTop()) || ((wheel_y-getPlotYOffset())/magnification>plotter->getPlotHeight()+plotter->getInternalPlotBorderTop());
+
+        if (mouseOnYAxis) {
+            // Mouse is on Y-axis area: only zoom Y with fixed mouse position, keep X unchanged
+            xmin = curr_xmin;
+            xmax = curr_xmax;
+            // Calculate relative position of mouse in current Y range (0 to 1)
+            const double rel_y = (mouse_data_y - curr_ymin) / (curr_ymax - curr_ymin);
+            ymin = mouse_data_y - rel_y * new_height;
+            ymax = mouse_data_y + (1.0 - rel_y) * new_height;
+        } else if (mouseOnXAxis) {
+            // Mouse is on X-axis area: only zoom X with fixed mouse position, keep Y unchanged
+            ymin = curr_ymin;
+            ymax = curr_ymax;
+            // Calculate relative position of mouse in current X range (0 to 1)
+            const double rel_x = (mouse_data_x - curr_xmin) / (curr_xmax - curr_xmin);
+            xmin = mouse_data_x - rel_x * new_width;
+            xmax = mouse_data_x + (1.0 - rel_x) * new_width;
+        } else {
+            // Mouse is inside plot area: zoom both axes with fixed mouse position
+            const double rel_x = (mouse_data_x - curr_xmin) / (curr_xmax - curr_xmin);
+            const double rel_y = (mouse_data_y - curr_ymin) / (curr_ymax - curr_ymin);
+            xmin = mouse_data_x - rel_x * new_width;
+            xmax = mouse_data_x + (1.0 - rel_x) * new_width;
+            ymin = mouse_data_y - rel_y * new_height;
+            ymax = mouse_data_y + (1.0 - rel_y) * new_height;
+        }
+        //qDebug()<<"  zoomFixedMouse: factor="<<factor;
         plotter->setXY(xmin, xmax, ymin, ymax, true);
     } else if (acTodo==WheelActionType::Pan && (d.x()!=0 || d.y()!=0)) {
         //qDebug()<<"  pan: d="<<d;
