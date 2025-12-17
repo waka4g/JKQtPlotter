@@ -164,7 +164,7 @@ JKQTPLOTTER_LIB_EXPORT JKQTPMouseDoubleClickActions String2JKQTPMouseDoubleClick
 enum JKQTPMouseWheelActions {
     jkqtpmwaZoomByWheel=0, /*!< \brief use the mouse-wheel for zooming */
     jkqtpmwaPanByWheel, /*!< \brief use the mouse-wheel for panning the plot */
-    jkqtpmwaZoomByWheelAndTrackpadPan, /*!< \brief use the mouse-wheel for zooming (centered on mouse), and track-pad pan gesture recognition. \note This is needed, because Qt converts track-pad zoom AND pan gestures to wheelEvents, but does not provide the source. Therefore a heuristics is required to interpret both! */
+    jkqtpmwaZoomByWheelAndTrackpadPan, /*!< \brief use the mouse-wheel for zooming. In addition, this tries to recognize track-pad pan gestures and applies them. \note This is needed, because Qt converts track-pad zoom AND pan gestures to wheelEvents, but does not provide the source. Therefore a heuristics is required to interpret both! */
     jkqtpmwaZoomFixedMouseByWheel, /*!< \brief use the mouse-wheel for zooming, while keeping the position under the mouse cursor fixed (Google Maps style zoom) */
     jkqtpmwaZoomFixedMouseByWheelAndTrackpadPan, /*!< \brief use the mouse-wheel for zooming with fixed mouse position, and track-pad pan gesture recognition. \note This is needed, because Qt converts track-pad zoom AND pan gestures to wheelEvents, but does not provide the source. Therefore a heuristics is required to interpret both! */
 };
