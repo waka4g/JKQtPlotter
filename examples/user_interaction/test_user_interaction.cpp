@@ -212,8 +212,10 @@ TestUserInteraction::TestUserInteraction(QWidget *parent) :
     cmbMouseWheelAction->addItem("jkqtpmwaZoomByWheel");
     cmbMouseWheelAction->addItem("jkqtpmwaPanByWheel");
     cmbMouseWheelAction->addItem("jkqtpmwaZoomByWheelAndTrackpadPan");
+    cmbMouseWheelAction->addItem("jkqtpmwaZoomFixedMouseByWheel");
+    cmbMouseWheelAction->addItem("jkqtpmwaZoomFixedMouseByWheelAndTrackpadPan");
     cmbMouseWheelAction->addItem("NoAction");
-    cmbMouseWheelAction->setCurrentIndex(2);
+    cmbMouseWheelAction->setCurrentIndex(4);
     connect(cmbMouseWheelAction, SIGNAL(currentIndexChanged(int)), this, SLOT(setMouseWheelNoModAction(int)));
     setMouseWheelNoModAction(cmbMouseWheelAction->currentIndex());
 

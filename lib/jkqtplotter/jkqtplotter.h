@@ -1376,6 +1376,7 @@ class JKQTPLOTTER_LIB_EXPORT JKQTPlotter: public QWidget {
 
         enum class WheelActionType {
             Zoom,
+            ZoomFixedMouse,
             Pan,
             None
         };

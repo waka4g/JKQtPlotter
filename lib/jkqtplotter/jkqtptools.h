@@ -165,6 +165,8 @@ enum JKQTPMouseWheelActions {
     jkqtpmwaZoomByWheel=0, /*!< \brief use the mouse-wheel for zooming */
     jkqtpmwaPanByWheel, /*!< \brief use the mouse-wheel for panning the plot */
     jkqtpmwaZoomByWheelAndTrackpadPan, /*!< \brief use the mouse-wheel for zooming. In addition, this tries to recognize track-pad pan gestures and applies them. \note This is needed, because Qt converts track-pad zoom AND pan gestures to wheelEvents, but does not provide the source. Therefore a heuristics is required to interpret both! */
+    jkqtpmwaZoomFixedMouseByWheel, /*!< \brief use the mouse-wheel for zooming, while keeping the position under the mouse cursor fixed (Google Maps style zoom) */
+    jkqtpmwaZoomFixedMouseByWheelAndTrackpadPan, /*!< \brief use the mouse-wheel for zooming with fixed mouse position, and track-pad pan gesture recognition. \note This is needed, because Qt converts track-pad zoom AND pan gestures to wheelEvents, but does not provide the source. Therefore a heuristics is required to interpret both! */
 };
 
 /** \brief convert a JKQTPMouseWheelActions to a <a href="http://doc.qt.io/qt-5/qstring.html">QString</a>
